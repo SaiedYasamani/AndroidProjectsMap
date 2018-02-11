@@ -1,10 +1,18 @@
 package com.android.yasamani.ilocation.Map;
 
+import android.location.Location;
 import android.util.Log;
 
 import com.android.yasamani.ilocation.Utils.Constants;
 import com.android.yasamani.ilocation.Utils.GoogleGeocodeEnteties.GoogleGeocodes;
+import com.android.yasamani.ilocation.Utils.LocationPoints;
+import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -18,6 +26,7 @@ public class Model implements contract.model {
 
     String TAG = "webservice Error";
     contract.presenter presenter;
+    Realm realm = Realm.getDefaultInstance();
 
     public Model(Presenter presenter) {
         this.presenter = presenter;
@@ -40,6 +49,31 @@ public class Model implements contract.model {
 
                 }
             });
+    }
+
+    @Override
+    public void getLocation(Location l) {
+        LocationPoints point = new LocationPoints(l.getLatitude(),l.getLongitude(),l.getTime());
+        presenter.loadLocation(point);
+    }
+
+    @Override
+    public void storeLocation(LocationPoints p) {
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(p);
+        realm.commitTransaction();
+    }
+
+    @Override
+    public void loadPoints() {
+
+        List<LocationPoints> points = realm.where(LocationPoints.class).findAll();
+        List<LatLng> pointList = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            pointList.add(new LatLng(points.get(i).getPointLat(),points.get(i).getPointLng()));
+        }
+
+        presenter.loadPoints(pointList);
     }
 
     private void onComplete() {

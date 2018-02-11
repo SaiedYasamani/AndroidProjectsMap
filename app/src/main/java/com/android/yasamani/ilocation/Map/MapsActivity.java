@@ -1,5 +1,9 @@
 package com.android.yasamani.ilocation.Map;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,12 +18,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import io.nlopez.smartlocation.SmartLocation;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         contract.view, GoogleMap.OnCameraIdleListener, GoogleMap.OnCameraMoveStartedListener {
 
     private GoogleMap mMap;
+    List<LatLng> pointsList = new ArrayList<>();
     contract.presenter presenter;
     EditText input;
     Button go;
@@ -28,8 +40,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        SmartLocation.with(this).location().start(new OnLocationUpdatedListener() {
+            @Override
+            public void onLocationUpdated(Location location) {
+                presenter.onLocationUpdate(location);
+                drawRoutGraph();
+            }
+        });
 
 
         presenter = new Presenter();
@@ -41,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.getCoordinates(input.getText().toString());
+                presenter.onAddressEntered(input.getText().toString());
             }
         });
     }
@@ -51,15 +73,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         setMapConfig();
-
         LatLng sydney = new LatLng(-34, 151);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
+        drawRoutGraph();
     }
 
-    void setMapConfig(){
+    void setMapConfig() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+        }
         mMap.setOnCameraIdleListener(this);
         mMap.setOnCameraMoveStartedListener(this);
+        mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setAllGesturesEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -76,13 +103,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         double lat = g.getResults().get(0).getGeometry().getLocation().getLat();
         double lng = g.getResults().get(0).getGeometry().getLocation().getLng();
-        LatLng userLocation = new LatLng(lat,lng);
+        LatLng userLocation = new LatLng(lat, lng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
     }
 
     @Override
-    public void makeToaste() {
-        Toast.makeText(this, "getted", Toast.LENGTH_SHORT).show();
+    public void drawRoutGraph() {
+        presenter.onLoadPoints();
+        Polyline userRout = mMap.addPolyline(new PolylineOptions().addAll(pointsList));
+    }
+
+    @Override
+    public void loadPoints(List<LatLng> pointList) {
+        pointsList = pointList;
     }
 
     @Override
