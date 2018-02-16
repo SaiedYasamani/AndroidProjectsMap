@@ -22,13 +22,26 @@
        android:hint="@string/enter_your_location"
        android:background="#fff"/>
 
-    <Button
-        android:id="@+id/go"
-        android:layout_below="@+id/searchBar"
-        android:layout_centerHorizontal="true"
-        android:layout_width="100dp"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/go"/>
+        android:layout_below="@+id/searchBar"
+        android:layout_centerInParent="true">
+
+        <Button
+            android:id="@+id/go"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/go"/>
+        <Button
+            android:id="@+id/delete"
+            android:layout_toEndOf="@+id/go"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/go"
+            android:text="@string/delete_history"/>
+
+    </RelativeLayout>
 
     <ImageView
         android:layout_width="wrap_content"

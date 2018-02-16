@@ -16,6 +16,7 @@ public interface contract {
 
     interface view{
         public void showCoordinates(GoogleGeocodes g);
+        public void showException();
         public void drawRoutGraph();
         public void loadPoints(List<LatLng> pointList);
     }
@@ -24,16 +25,12 @@ public interface contract {
         public void onAttachView(view v);
         public void onAddressEntered(String address);
         public void loadCoordinates(GoogleGeocodes g);
-        public void onLocationUpdate(android.location.Location l);
-        public void loadLocation(LocationPoints p);
         public void onLoadPoints();
         public void loadPoints(List<LatLng> pointList);
     }
 
     interface model{
         public void getCoordinates(String address);
-        public void getLocation(Location l);
-        public void storeLocation(LocationPoints p);
         public void loadPoints();
     }
 }

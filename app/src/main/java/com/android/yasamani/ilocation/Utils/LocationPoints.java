@@ -18,13 +18,22 @@ public class LocationPoints extends RealmObject {
     double pointLng;
     double pointTime;
 
-    public LocationPoints(double pointLat, double pointLng, double pointTime) {
+    public LocationPoints(int id, double pointLat, double pointLng, double pointTime) {
+        this.id = id;
         this.pointLat = pointLat;
         this.pointLng = pointLng;
         this.pointTime = pointTime;
     }
 
     public LocationPoints(){}
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public double getPointLat() {
         return pointLat;
@@ -53,7 +62,8 @@ public class LocationPoints extends RealmObject {
     @Override
     public String toString() {
         return "LocationPoints{" +
-                "pointLat=" + pointLat +
+                "id=" + id +
+                ", pointLat=" + pointLat +
                 ", pointLng=" + pointLng +
                 ", pointTime=" + pointTime +
                 '}';

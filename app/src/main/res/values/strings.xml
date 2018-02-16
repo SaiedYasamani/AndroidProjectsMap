@@ -5,4 +5,5 @@
     <string name="enter_your_location">Enter Your Location...</string>
     <string name="todo">TODO</string>
     <string name="go">GO</string>
+    <string name="delete_history">Delete History</string>
 </resources>

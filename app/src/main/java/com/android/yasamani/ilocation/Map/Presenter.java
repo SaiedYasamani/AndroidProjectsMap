@@ -1,5 +1,6 @@
 package com.android.yasamani.ilocation.Map;
 
+import android.content.Context;
 import android.location.Location;
 
 import com.android.yasamani.ilocation.Utils.GoogleGeocodeEnteties.GoogleGeocodes;
@@ -27,22 +28,18 @@ public class Presenter implements contract.presenter {
 
     @Override
     public void onAddressEntered(String address) {
-        model.getCoordinates(address);
+        if (address.isEmpty()){
+            view.showException();
+        }
+        else {
+
+            model.getCoordinates(address);
+        }
     }
 
     @Override
     public void loadCoordinates(GoogleGeocodes g) {
         view.showCoordinates(g);
-    }
-
-    @Override
-    public void onLocationUpdate(Location l) {
-        model.getLocation(l);
-    }
-
-    @Override
-    public void loadLocation(LocationPoints p) {
-        model.storeLocation(p);
     }
 
     @Override
@@ -52,6 +49,6 @@ public class Presenter implements contract.presenter {
 
     @Override
     public void loadPoints(List<LatLng> pointList) {
-
+        view.loadPoints(pointList);
     }
 }

@@ -52,19 +52,6 @@ public class Model implements contract.model {
     }
 
     @Override
-    public void getLocation(Location l) {
-        LocationPoints point = new LocationPoints(l.getLatitude(),l.getLongitude(),l.getTime());
-        presenter.loadLocation(point);
-    }
-
-    @Override
-    public void storeLocation(LocationPoints p) {
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(p);
-        realm.commitTransaction();
-    }
-
-    @Override
     public void loadPoints() {
 
         List<LocationPoints> points = realm.where(LocationPoints.class).findAll();
